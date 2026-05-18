@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz War PRO 🎓</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- OVERLAYS -->
+<div class="notif" id="notif"></div>
+<div class="toast" id="toast"></div>
+<div id="win-screen"></div>
+
+<!-- ════════ HOME ════════ -->
+<div id="home" class="screen active">
+  <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:24px;">
+    <div class="home-inner anim-in">
+      <div class="home-title title-gradient">🎯 Quiz War</div>
+      <div class="home-subtitle">Custom Questions • Teacher Dashboard • Live Stats</div>
+      <div class="home-menu">
+        <button class="menu-btn menu-play" onclick="goTo('game-setup')">
+          <span class="menu-btn-icon">⚔️</span>
+          <div>
+            <div class="menu-btn-title">Play!</div>
+            <div class="menu-btn-desc">Enter both player names and start the battle</div>
+          </div>
+        </button>
+        <button class="menu-btn menu-teacher" onclick="goTo('teacher-login')">
+          <span class="menu-btn-icon">🧑‍🏫</span>
+          <div>
+            <div class="menu-btn-title">Teacher Panel</div>
+            <div class="menu-btn-desc">Add questions, manage topics, view player stats</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ TEACHER LOGIN ════════ -->
+<div id="teacher-login" class="screen">
+  <button class="back-btn back-btn-abs" onclick="goTo('home')">← Back</button>
+  <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:24px;">
+    <div class="login-card card">
+      <div class="text-center mb-16">
+        <div style="font-size:2.4rem; margin-bottom:8px;">🔐</div>
+        <div style="font-family:'Fredoka One',cursive; font-size:1.4rem;" class="title-gradient">Teacher Login</div>
+        <div class="text-muted text-sm mt-8">Default password: <strong style="color:var(--purple)">teacher123</strong></div>
+      </div>
+      <div class="form-group">
+        <label class="label">Password</label>
+        <input class="input" type="password" id="teacher-pwd" placeholder="Enter password...">
+      </div>
+      <button class="btn btn-secondary full-width mt-16" onclick="teacherLogin()">🚪 Login</button>
+      <div class="divider"></div>
+      <div class="text-muted text-sm text-center">Change your password inside Teacher Dashboard → Settings</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ TEACHER DASHBOARD ════════ -->
+<div id="teacher-dash" class="screen">
+  <div class="dash-header">
+    <div class="flex align-center gap-12">
+      <button class="back-btn" onclick="goTo('home')">← Home</button>
+      <div class="dash-title">🧑‍🏫 Teacher Dashboard</div>
+    </div>
+    <div class="flex align-center gap-8">
+      <span class="badge badge-purple" id="q-count-badge">0 Questions</span>
+      <span class="badge badge-green"  id="p-count-badge">0 Players</span>
+    </div>
+  </div>
+  <div class="dash-tabs">
+    <button class="tab active" onclick="switchTab('add-q')">➕ Add Question</button>
+    <button class="tab"        onclick="switchTab('view-q')">📋 View Questions</button>
+    <button class="tab"        onclick="switchTab('player-stats')">📊 Player Stats</button>
+    <button class="tab"        onclick="switchTab('settings')">⚙️ Settings</button>
+  </div>
+  <div class="dash-content">
+
+    <!-- ADD QUESTION -->
+    <div class="tab-pane active" id="tab-add-q">
+      <div class="card">
+        <div style="font-family:'Fredoka One',cursive; font-size:1.1rem; margin-bottom:16px;">📝 Add New Question</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="label">Subject</label>
+            <select class="input" id="aq-subject">
+              <option value="custom">🌟 Custom</option>
+              <option value="science">🔬 Science</option>
+              <option value="english">📖 English</option>
+              <option value="gk">🌍 General Knowledge</option>
+              <option value="cs">💻 Computer Science</option>
+              <option value="math">🔢 Math</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="label">Level</label>
+            <select class="input" id="aq-level">
+              <option value="beginner">🌱 Beginner (Class 1–5)</option>
+              <option value="medium">⚡ Medium (Class 5–7)</option>
+              <option value="hard">🔥 Advanced (Class 8–11)</option>
+            </select>
+          </div>
+          <div class="form-group span-full">
+            <label class="label">Topic / Chapter Name</label>
+            <input class="input" type="text" id="aq-topic" placeholder="e.g. Motion, Photosynthesis, Adjectives...">
+          </div>
+          <div class="form-group span-full">
+            <label class="label">Question</label>
+            <input class="input" type="text" id="aq-question" placeholder="Type your question here...">
+          </div>
+        </div>
+        <div class="mt-12 mb-8"><span class="label">Answer Options</span></div>
+        <div class="option-grid">
+          <div class="option-row"><div class="option-letter ol-A">A</div><input class="input" type="text" id="aq-opt0" placeholder="Option A"></div>
+          <div class="option-row"><div class="option-letter ol-B">B</div><input class="input" type="text" id="aq-opt1" placeholder="Option B"></div>
+          <div class="option-row"><div class="option-letter ol-C">C</div><input class="input" type="text" id="aq-opt2" placeholder="Option C"></div>
+          <div class="option-row"><div class="option-letter ol-D">D</div><input class="input" type="text" id="aq-opt3" placeholder="Option D"></div>
+        </div>
+        <div class="mt-12">
+          <span class="label">Correct Answer</span>
+          <div class="correct-radio mt-8" id="correct-radio">
+            <div class="correct-opt selected" onclick="selectCorrectAnswer(0)"><input type="radio" name="correct" value="0" checked> A</div>
+            <div class="correct-opt"          onclick="selectCorrectAnswer(1)"><input type="radio" name="correct" value="1"> B</div>
+            <div class="correct-opt"          onclick="selectCorrectAnswer(2)"><input type="radio" name="correct" value="2"> C</div>
+            <div class="correct-opt"          onclick="selectCorrectAnswer(3)"><input type="radio" name="correct" value="3"> D</div>
+          </div>
+        </div>
+        <button class="btn btn-green full-width mt-16" onclick="saveQuestion()">✅ Save Question</button>
+      </div>
+    </div>
+
+    <!-- VIEW QUESTIONS -->
+    <div class="tab-pane" id="tab-view-q">
+      <div class="flex align-center space-between mb-12" style="flex-wrap:wrap; gap:8px;">
+        <div style="font-family:'Fredoka One',cursive; font-size:1rem;">📋 Uploaded Questions</div>
+        <button class="btn btn-red btn-sm" onclick="clearAllQuestions()">🗑️ Delete All</button>
+      </div>
+      <div class="filter-row" id="topic-filters"></div>
+      <div id="questions-list"></div>
+    </div>
+
+    <!-- PLAYER STATS -->
+    <div class="tab-pane" id="tab-player-stats">
+      <div class="flex align-center space-between mb-16" style="flex-wrap:wrap; gap:8px;">
+        <div style="font-family:'Fredoka One',cursive; font-size:1rem;">📊 Player Statistics</div>
+        <button class="btn btn-red btn-sm" onclick="clearAllStats()">🗑️ Reset Stats</button>
+      </div>
+      <div id="player-stats-table"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="tab-pane" id="tab-settings">
+      <div class="card" style="max-width:400px;">
+        <div style="font-family:'Fredoka One',cursive; font-size:1.1rem; margin-bottom:16px;">⚙️ Settings</div>
+        <div class="form-group">
+          <label class="label">New Password</label>
+          <input class="input" type="password" id="new-pwd" placeholder="Enter new password...">
+        </div>
+        <div class="form-group mt-8">
+          <label class="label">Confirm Password</label>
+          <input class="input" type="password" id="confirm-pwd" placeholder="Re-enter password...">
+        </div>
+        <button class="btn btn-secondary full-width mt-16" onclick="changePassword()">🔒 Change Password</button>
+        <div class="divider"></div>
+        <div class="text-muted text-sm">Questions and player data are saved in the browser and persist after closing the tab.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════ GAME SETUP ════════ -->
+<div id="game-setup" class="screen">
+  <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:20px; overflow-y:auto;">
+    <div class="setup-card card">
+      <button class="back-btn" style="margin-bottom:14px;" onclick="goTo('home')">← Home</button>
+      <div class="text-center mb-16">
+        <div style="font-family:'Fredoka One',cursive; font-size:1.8rem;" class="title-gradient">⚔️ Game Setup</div>
+      </div>
+
+      <span class="label">📚 Choose Subject</span>
+      <div class="subject-grid">
+        <button class="subject-pill sp-math active" data-s="math"    onclick="selectSubject('math')">🔢 Math<small>Numbers</small></button>
+        <button class="subject-pill sp-sci"         data-s="science" onclick="selectSubject('science')">🔬 Science<small>Physics etc.</small></button>
+        <button class="subject-pill sp-eng"         data-s="english" onclick="selectSubject('english')">📖 English<small>Grammar</small></button>
+        <button class="subject-pill sp-gk"          data-s="gk"      onclick="selectSubject('gk')">🌍 G.K.<small>Knowledge</small></button>
+        <button class="subject-pill sp-cs"          data-s="cs"      onclick="selectSubject('cs')">💻 Comp Sci<small>Tech</small></button>
+        <button class="subject-pill sp-custom"      data-s="custom"  onclick="selectSubject('custom')">🌟 Custom<small>Teacher's</small></button>
+      </div>
+
+      <div class="topic-select" id="topic-select-wrap">
+        <span class="label">📌 Choose Topic</span>
+        <select class="input mt-8 mb-12" id="game-topic-select">
+          <option value="all">All Topics</option>
+        </select>
+      </div>
+
+      <span class="label">📊 Choose Level</span>
+      <div class="level-row mt-8">
+        <button class="level-pill active" data-l="beginner" onclick="selectLevel('beginner')">🌱 Beginner<small>Class 1–5</small></button>
+        <button class="level-pill"        data-l="medium"   onclick="selectLevel('medium')">⚡ Medium<small>Class 5–7</small></button>
+        <button class="level-pill"        data-l="hard"     onclick="selectLevel('hard')">🔥 Advanced<small>Class 8–11</small></button>
+      </div>
+
+      <div class="divider"></div>
+      <span class="label">🎮 Player Names</span>
+      <div class="flex gap-12 mt-8 mb-8">
+        <div style="flex:1;"><div class="option-row gap-8"><span style="font-size:1.3rem;">🔴</span><input class="input" type="text" id="gs-p1" placeholder="Player 1 name" maxlength="14"></div></div>
+        <div style="flex:1;"><div class="option-row gap-8"><span style="font-size:1.3rem;">🔵</span><input class="input" type="text" id="gs-p2" placeholder="Player 2 name" maxlength="14"></div></div>
+      </div>
+      <button class="btn btn-primary full-width mt-8" onclick="startGame()" style="font-size:1.1rem; padding:14px;">🚀 Play!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ GAME SCREEN ════════ -->
+<div id="game" class="screen">
+  <div class="game-header">
+    <div class="player-scorebox p1-box">
+      <span class="avatar">🔴</span>
+      <div><div class="name" id="h-p1n">P1</div><div class="score score-p1"><span id="sc1">0</span>/3</div></div>
+    </div>
+    <div class="header-center">
+      <div class="header-title">⚔️ Quiz Tug of War</div>
+      <div class="header-badge" id="hbadge">Math • Beginner</div>
+    </div>
+    <div class="player-scorebox p2-box">
+      <div style="text-align:right;"><div class="name" id="h-p2n">P2</div><div class="score score-p2"><span id="sc2">0</span>/3</div></div>
+      <span class="avatar">🔵</span>
+    </div>
+  </div>
+
+  <div class="game-area">
+    <!-- Player 1 -->
+    <div class="player-panel active-p1" id="pp1">
+      <div class="status-msg status-p1" id="st1">🎯 YOUR TURN!</div>
+      <div class="question-box qbox-p1">
+        <div class="q-label">🔴 Player 1</div>
+        <div class="q-text" id="qt1">...</div>
+        <div class="answer-display ans-p1" id="ad1">_</div>
+      </div>
+      <div class="calculator" id="calc1">
+        <button class="calc-btn num-p1" onclick="pressNumber(1,'7')">7</button><button class="calc-btn num-p1" onclick="pressNumber(1,'8')">8</button><button class="calc-btn num-p1" onclick="pressNumber(1,'9')">9</button>
+        <button class="calc-btn num-p1" onclick="pressNumber(1,'4')">4</button><button class="calc-btn num-p1" onclick="pressNumber(1,'5')">5</button><button class="calc-btn num-p1" onclick="pressNumber(1,'6')">6</button>
+        <button class="calc-btn num-p1" onclick="pressNumber(1,'1')">1</button><button class="calc-btn num-p1" onclick="pressNumber(1,'2')">2</button><button class="calc-btn num-p1" onclick="pressNumber(1,'3')">3</button>
+        <button class="calc-btn del-p1" onclick="pressNumber(1,'del')">⌫</button><button class="calc-btn num-p1" onclick="pressNumber(1,'0')">0</button><button class="calc-btn del-p1" onclick="pressNumber(1,'clr')">C</button>
+        <button class="calc-btn submit-p1" onclick="submitMath(1)">✅ SUBMIT!</button>
+      </div>
+      <div class="mcq-grid" id="mcq1" style="display:none;">
+        <button class="mcq-btn mcq-p1" id="o1-0" onclick="pickMCQ(1,0)"><span class="mcq-letter">A</span><span id="ot1-0">—</span></button>
+        <button class="mcq-btn mcq-p1" id="o1-1" onclick="pickMCQ(1,1)"><span class="mcq-letter">B</span><span id="ot1-1">—</span></button>
+        <button class="mcq-btn mcq-p1" id="o1-2" onclick="pickMCQ(1,2)"><span class="mcq-letter">C</span><span id="ot1-2">—</span></button>
+        <button class="mcq-btn mcq-p1" id="o1-3" onclick="pickMCQ(1,3)"><span class="mcq-letter">D</span><span id="ot1-3">—</span></button>
+      </div>
+    </div>
+
+    <!-- Rope -->
+    <div class="rope-section">
+      <div class="rope-container" id="rcon">
+        <div class="zone-top"></div><div class="zone-bottom"></div>
+        <div class="rope-track" id="rtk"></div>
+        <div class="rope-pip rp1 pip-neutral" id="rp1"></div><div class="rope-pip rp2 pip-neutral" id="rp2"></div>
+        <div class="rope-center"></div>
+        <div class="rope-pip rp3 pip-neutral" id="rp3"></div><div class="rope-pip rp4 pip-neutral" id="rp4"></div>
+        <div class="rope-knot" id="rkn"></div>
+        <div class="puller puller-top">🔴</div><div class="puller puller-bottom">🔵</div>
+        <div class="rope-flag flag-top">🚩</div><div class="rope-flag flag-bottom">🚩</div>
+      </div>
+      <div class="vs-label">VS</div>
+    </div>
+
+    <!-- Player 2 -->
+    <div class="player-panel active-p2" id="pp2">
+      <div class="status-msg status-p2" id="st2">🎯 YOUR TURN!</div>
+      <div class="question-box qbox-p2">
+        <div class="q-label">🔵 Player 2</div>
+        <div class="q-text" id="qt2">...</div>
+        <div class="answer-display ans-p2" id="ad2">_</div>
+      </div>
+      <div class="calculator" id="calc2">
+        <button class="calc-btn num-p2" onclick="pressNumber(2,'7')">7</button><button class="calc-btn num-p2" onclick="pressNumber(2,'8')">8</button><button class="calc-btn num-p2" onclick="pressNumber(2,'9')">9</button>
+        <button class="calc-btn num-p2" onclick="pressNumber(2,'4')">4</button><button class="calc-btn num-p2" onclick="pressNumber(2,'5')">5</button><button class="calc-btn num-p2" onclick="pressNumber(2,'6')">6</button>
+        <button class="calc-btn num-p2" onclick="pressNumber(2,'1')">1</button><button class="calc-btn num-p2" onclick="pressNumber(2,'2')">2</button><button class="calc-btn num-p2" onclick="pressNumber(2,'3')">3</button>
+        <button class="calc-btn del-p2" onclick="pressNumber(2,'del')">⌫</button><button class="calc-btn num-p2" onclick="pressNumber(2,'0')">0</button><button class="calc-btn del-p2" onclick="pressNumber(2,'clr')">C</button>
+        <button class="calc-btn submit-p2" onclick="submitMath(2)">✅ SUBMIT!</button>
+      </div>
+      <div class="mcq-grid" id="mcq2" style="display:none;">
+        <button class="mcq-btn mcq-p2" id="o2-0" onclick="pickMCQ(2,0)"><span class="mcq-letter">A</span><span id="ot2-0">—</span></button>
+        <button class="mcq-btn mcq-p2" id="o2-1" onclick="pickMCQ(2,1)"><span class="mcq-letter">B</span><span id="ot2-1">—</span></button>
+        <button class="mcq-btn mcq-p2" id="o2-2" onclick="pickMCQ(2,2)"><span class="mcq-letter">C</span><span id="ot2-2">—</span></button>
+        <button class="mcq-btn mcq-p2" id="o2-3" onclick="pickMCQ(2,3)"><span class="mcq-letter">D</span><span id="ot2-3">—</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STORAGE ──
+const KEYS = { password:'qtw:pwd', questions:'qtw:questions', stats:'qtw:stats' };
+function loadData(key)     { try{return JSON.parse(localStorage.getItem(key));}catch(e){return null;} }
+function saveData(key,val) { localStorage.setItem(key,JSON.stringify(val)); }
+function getQuestions()    { return loadData(KEYS.questions)||[]; }
+function saveQuestions(qs) { saveData(KEYS.questions,qs); updateDashboardBadges(); }
+function getStats()        { return loadData(KEYS.stats)||{}; }
+function saveStats(s)      { saveData(KEYS.stats,s); updateDashboardBadges(); }
+function getPassword()     { return loadData(KEYS.password)||'teacher123'; }
+
+// ── AUDIO ──
+let audioCtx=null;
+function getAudioCtx(){ if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+function playTone(freq,type,dur,vol=0.35,delay=0){
+  try{
+    const ctx=getAudioCtx(), now=ctx.currentTime+delay;
+    const osc=ctx.createOscillator(), gain=ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type=type; osc.frequency.setValueAtTime(freq,now);
+    gain.gain.setValueAtTime(vol,now); gain.gain.exponentialRampToValueAtTime(0.001,now+dur);
+    osc.start(now); osc.stop(now+dur);
+  }catch(e){}
+}
+function sfxClick()   { playTone(700,'square',.07,.1); }
+function sfxCorrect() { [523,659,784,1047].forEach((f,i)=>playTone(f,'sine',.2,.28,i*.07)); }
+function sfxWrong()   { [280,200,140].forEach((f,i)=>playTone(f,'sawtooth',.15,.3,i*.1)); }
+function sfxRope()    { playTone(180,'triangle',.14,.2,0); playTone(90,'sine',.18,.26,.13); }
+function sfxWin(){
+  [523,659,784,880,1047].forEach((f,i)=>{ playTone(f,'sine',.22,.36,i*.1); playTone(f*1.5,'triangle',.13,.13,i*.1+.05); });
+  setTimeout(()=>[784,880,1047,1319].forEach((f,i)=>playTone(f,'sine',.36,.3,i*.08)),650);
+}
+
+// ── NAVIGATION ──
+let pendingTab=null;
+function goTo(screenId,tab=null){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0,0); if(tab) pendingTab=tab; sfxClick();
+}
+
+// ── TEACHER PANEL ──
+let selectedCorrectAnswer=0;
+
+function teacherLogin(){
+  const input=document.getElementById('teacher-pwd').value;
+  if(input===getPassword()){
+    document.getElementById('teacher-pwd').value='';
+    updateDashboardBadges(); renderQuestionList(); renderPlayerStats();
+    goTo('teacher-dash');
+    if(pendingTab){switchTab(pendingTab);pendingTab=null;} else switchTab('add-q');
+  } else showNotif('❌ Wrong password!','err');
+}
+
+function switchTab(tabId){
+  const ids=['add-q','view-q','player-stats','settings'];
+  document.querySelectorAll('.tab').forEach((btn,i)=>btn.classList.toggle('active',ids[i]===tabId));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  const pane=document.getElementById('tab-'+tabId);
+  if(pane){
+    pane.classList.add('active');
+    if(tabId==='view-q') renderQuestionList();
+    if(tabId==='player-stats') renderPlayerStats();
+  }
+}
+
+function selectCorrectAnswer(idx){
+  selectedCorrectAnswer=idx;
+  document.querySelectorAll('.correct-opt').forEach((el,i)=>el.classList.toggle('selected',i===idx));
+}
+
+function saveQuestion(){
+  const subject=document.getElementById('aq-subject').value;
+  const level=document.getElementById('aq-level').value;
+  const topic=document.getElementById('aq-topic').value.trim();
+  const question=document.getElementById('aq-question').value.trim();
+  const options=[0,1,2,3].map(i=>document.getElementById(`aq-opt${i}`).value.trim());
+  if(!topic)               {showNotif('⚠️ Please enter a topic name!','err');return;}
+  if(!question)            {showNotif('⚠️ Please enter a question!','err');return;}
+  if(options.some(o=>!o)) {showNotif('⚠️ Please fill all 4 options!','err');return;}
+  const qs=getQuestions();
+  qs.push({id:Date.now(),subject,level,topic,question,options,answer:selectedCorrectAnswer,addedOn:new Date().toLocaleDateString('en-IN')});
+  saveQuestions(qs);
+  ['aq-topic','aq-question','aq-opt0','aq-opt1','aq-opt2','aq-opt3'].forEach(id=>document.getElementById(id).value='');
+  selectCorrectAnswer(0); showNotif('✅ Question saved!','ok'); updateTopicDropdown();
+}
+
+function renderQuestionList(filterTopic='all'){
+  const questions=getQuestions();
+  const topics=[...new Set(questions.map(q=>q.topic))];
+  const fr=document.getElementById('topic-filters');
+  fr.innerHTML=`<button class="filter-chip ${filterTopic==='all'?'active':''}" onclick="renderQuestionList('all')">All (${questions.length})</button>`;
+  topics.forEach(t=>{
+    const cnt=questions.filter(q=>q.topic===t).length;
+    fr.innerHTML+=`<button class="filter-chip ${filterTopic===t?'active':''}" onclick="renderQuestionList('${t}')">${t} (${cnt})</button>`;
+  });
+  const filtered=filterTopic==='all'?questions:questions.filter(q=>q.topic===filterTopic);
+  const list=document.getElementById('questions-list');
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty-state"><div class="icon">📭</div><div class="bold">No questions yet</div><div class="text-muted" style="margin-top:8px;">Add questions from the Teacher Panel</div></div>`;
+    return;
+  }
+  const SUBJ_EMOJI={math:'🔢',science:'🔬',english:'📖',gk:'🌍',cs:'💻',custom:'🌟'};
+  const LVL_CLASS={beginner:'badge-green',medium:'badge-gold',hard:'badge-red'};
+  list.innerHTML=filtered.map((q,i)=>`
+    <div class="question-card">
+      <div class="q-meta">
+        <span class="badge badge-purple">${SUBJ_EMOJI[q.subject]||'🌟'} ${q.subject}</span>
+        <span class="badge ${LVL_CLASS[q.level]||'badge-blue'}">${q.level}</span>
+        <span class="badge badge-blue">📌 ${q.topic}</span>
+        <span class="text-muted text-sm" style="margin-left:auto;">${q.addedOn||''}</span>
+      </div>
+      <div class="q-text">${i+1}. ${q.question}</div>
+      <div class="q-opts">${q.options.map((o,oi)=>`<div class="q-opt ${oi===q.answer?'correct':''}">${['A','B','C','D'][oi]}. ${o} ${oi===q.answer?'✅':''}</div>`).join('')}</div>
+      <div class="q-actions"><button class="delete-btn" onclick="deleteQuestion(${q.id})">🗑️ Delete</button></div>
+    </div>`).join('');
+}
+
+function deleteQuestion(id){ saveQuestions(getQuestions().filter(q=>q.id!==id)); renderQuestionList(); showNotif('🗑️ Question deleted','ok'); }
+function clearAllQuestions(){ if(!confirm('Delete all questions?')) return; saveQuestions([]); renderQuestionList(); showNotif('🗑️ All questions deleted','ok'); }
+function changePassword(){
+  const np=document.getElementById('new-pwd').value;
+  const cp=document.getElementById('confirm-pwd').value;
+  if(!np)      {showNotif('⚠️ Please enter a password!','err');return;}
+  if(np!==cp)  {showNotif('⚠️ Passwords do not match!','err');return;}
+  saveData(KEYS.password,np);
+  document.getElementById('new-pwd').value=''; document.getElementById('confirm-pwd').value='';
+  showNotif('✅ Password changed!','ok');
+}
+
+// ── PLAYER STATS ──
+const AVATAR_COLORS=['#E8365D','#2563EB','#16A34A','#D97706','#7C3AED','#0891B2','#EC4899','#F97316'];
+
+function updateDashboardBadges(){
+  const qb=document.getElementById('q-count-badge');
+  const pb=document.getElementById('p-count-badge');
+  if(qb) qb.textContent=`${getQuestions().length} Questions`;
+  if(pb) pb.textContent=`${Object.keys(getStats()).length} Players`;
+}
+
+function savePlayerResult(name,correct,wrong,total,subject,level,won){
+  const stats=getStats();
+  if(!stats[name]) stats[name]={correct:0,wrong:0,total:0,gamesPlayed:0,wins:0,history:[]};
+  stats[name].correct+=correct; stats[name].wrong+=wrong; stats[name].total+=total;
+  stats[name].gamesPlayed+=1; if(won) stats[name].wins+=1;
+  stats[name].history.push({date:new Date().toLocaleDateString('en-IN'),correct,wrong,total,subject,level,won,accuracy:total>0?Math.round(correct/total*100):0});
+  saveStats(stats);
+}
+
+function renderPlayerStats(){
+  const stats=getStats();
+  const container=document.getElementById('player-stats-table');
+  const players=Object.entries(stats).map(([name,d])=>({name,...d,accuracy:d.total>0?Math.round(d.correct/d.total*100):0})).sort((a,b)=>b.accuracy-a.accuracy||b.correct-a.correct);
+  if(!players.length){
+    container.innerHTML=`<div class="empty-state"><div class="icon">👥</div><div class="bold">No players yet</div><div class="text-muted" style="margin-top:8px;">Play a game first — stats will appear here</div></div>`;
+    return;
+  }
+  const medals=['🥇','🥈','🥉'];
+  container.innerHTML=`<div style="overflow-x:auto;"><table class="stats-table">
+    <thead><tr><th>#</th><th>Player</th><th>Games</th><th>✅ Correct</th><th>❌ Wrong</th><th>Total</th><th>🏆 Wins</th><th>Accuracy</th><th></th></tr></thead>
+    <tbody>${players.map((p,i)=>`
+      <tr>
+        <td><span class="rank-num" style="color:${i<3?['#D97706','#64748B','#92400E'][i]:'#CBD5E1'}">${medals[i]||i+1}</span></td>
+        <td><div class="player-cell"><div class="player-avatar" style="background:${AVATAR_COLORS[i%AVATAR_COLORS.length]}18;border:1.5px solid ${AVATAR_COLORS[i%AVATAR_COLORS.length]}44;color:${AVATAR_COLORS[i%AVATAR_COLORS.length]}">${p.name[0].toUpperCase()}</div><span class="bold">${p.name}</span></div></td>
+        <td>${p.gamesPlayed}</td>
+        <td style="color:var(--green);font-weight:900;">${p.correct}</td>
+        <td style="color:var(--red);font-weight:900;">${p.wrong}</td>
+        <td style="color:var(--p2);font-weight:900;">${p.total}</td>
+        <td style="color:var(--gold);font-weight:900;">${p.wins||0}</td>
+        <td><div style="display:flex;align-items:center;gap:8px;"><div class="acc-bar"><div class="acc-fill" style="width:${p.accuracy}%;background:${p.accuracy>=70?'var(--green)':p.accuracy>=40?'var(--gold)':'var(--red)'}"></div></div><span style="font-weight:900;font-size:.85rem;color:${p.accuracy>=70?'var(--green)':p.accuracy>=40?'var(--gold)':'var(--red)'}">${p.accuracy}%</span></div></td>
+        <td><button class="expand-btn" onclick="toggleHistory('${p.name}',this)">View ▼</button></td>
+      </tr>
+      <tr class="history-row" id="hist-${p.name.replace(/\s/g,'_')}">
+        <td colspan="9"><div class="history-inner">
+          <div class="bold mb-8" style="font-size:.9rem;">📅 ${p.name}'s last ${Math.min(5,p.history.length)} games</div>
+          ${(p.history||[]).slice(-5).reverse().map(h=>`
+            <div style="background:white;border-radius:9px;padding:10px;margin-bottom:7px;border:1px solid var(--border);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <span class="text-muted text-sm">${h.date} • ${h.subject||'?'} • ${h.level||'?'}</span>
+                <span class="badge ${h.won?'badge-green':'badge-red'}">${h.won?'🏆 Won':'😔 Lost'}</span>
+              </div>
+              <div class="history-grid">
+                <div class="history-cell"><div class="history-val" style="color:var(--green)">${h.correct}</div><div class="history-lbl">Correct</div></div>
+                <div class="history-cell"><div class="history-val" style="color:var(--red)">${h.wrong}</div><div class="history-lbl">Wrong</div></div>
+                <div class="history-cell"><div class="history-val" style="color:var(--p2)">${h.total}</div><div class="history-lbl">Total</div></div>
+                <div class="history-cell"><div class="history-val" style="color:var(--gold)">${h.accuracy}%</div><div class="history-lbl">Accuracy</div></div>
+              </div>
+            </div>`).join('')}
+        </div></td>
+      </tr>`).join('')}
+    </tbody></table></div>`;
+}
+
+function toggleHistory(name,btn){
+  const row=document.getElementById('hist-'+name.replace(/\s/g,'_'));
+  const isOpen=row.style.display==='table-row';
+  row.style.display=isOpen?'none':'table-row';
+  btn.textContent=isOpen?'View ▼':'Hide ▲';
+}
+function clearAllStats(){ if(!confirm('Reset all player stats?')) return; saveStats({}); renderPlayerStats(); showNotif('🗑️ All stats reset','ok'); }
+
+// ── GAME SETUP ──
+let currentSubject='math', currentLevel='beginner';
+
+function selectSubject(subject){
+  currentSubject=subject; sfxClick();
+  document.querySelectorAll('.subject-pill').forEach(btn=>btn.classList.toggle('active',btn.dataset.s===subject));
+  const wrap=document.getElementById('topic-select-wrap');
+  if(subject==='custom'){wrap.classList.add('show');updateTopicDropdown();}
+  else wrap.classList.remove('show');
+}
+function selectLevel(level){
+  currentLevel=level; sfxClick();
+  document.querySelectorAll('.level-pill').forEach(btn=>btn.classList.toggle('active',btn.dataset.l===level));
+}
+function updateTopicDropdown(){
+  const sel=document.getElementById('game-topic-select');
+  const topics=[...new Set(getQuestions().map(q=>q.topic))];
+  sel.innerHTML=`<option value="all">🌟 All Topics (${getQuestions().length} questions)</option>`;
+  topics.forEach(t=>{const cnt=getQuestions().filter(q=>q.topic===t).length; sel.innerHTML+=`<option value="${t}">${t} (${cnt} questions)</option>`;});
+}
+
+// ── QUESTION BANKS ──
+const QUESTION_BANK={
+  science:{
+    beginner:[
+      {q:"Biggest planet in our solar system?",o:["Earth","Jupiter","Mars","Saturn"],a:1},
+      {q:"How many legs does an insect have?",o:["4","6","8","2"],a:1},
+      {q:"Gas we breathe in?",o:["CO₂","Nitrogen","Oxygen","Hydrogen"],a:2},
+      {q:"What do bees make?",o:["Milk","Honey","Sugar","Oil"],a:1},
+      {q:"Fastest land animal?",o:["Lion","Tiger","Cheetah","Horse"],a:2},
+      {q:"Plant part underground?",o:["Leaf","Flower","Root","Branch"],a:2},
+      {q:"Planet closest to the Sun?",o:["Earth","Venus","Mercury","Mars"],a:2},
+      {q:"Color of chlorophyll?",o:["Red","Blue","Yellow","Green"],a:3},
+      {q:"Caterpillar becomes a…?",o:["Bee","Butterfly","Bird","Fish"],a:1},
+      {q:"Animal that gives wool?",o:["Cow","Goat","Sheep","Hen"],a:2},
+    ],
+    medium:[
+      {q:"Chemical formula of water?",o:["H₂O₂","CO₂","H₂O","H₂SO₄"],a:2},
+      {q:"Powerhouse of the cell?",o:["Nucleus","Ribosome","Mitochondria","Golgi"],a:2},
+      {q:"SI unit of force?",o:["Joule","Watt","Newton","Pascal"],a:2},
+      {q:"Sound travels fastest in?",o:["Air","Water","Vacuum","Solid"],a:3},
+      {q:"Human heart chambers?",o:["2","3","4","5"],a:2},
+      {q:"Symbol of Gold?",o:["Go","Gd","Au","Ag"],a:2},
+      {q:"Organ producing insulin?",o:["Liver","Kidney","Pancreas","Stomach"],a:2},
+      {q:"Smallest unit of life?",o:["Tissue","Organ","Cell","Atom"],a:2},
+      {q:"Boiling point of water?",o:["90°C","95°C","100°C","110°C"],a:2},
+      {q:"WBC function?",o:["Carry oxygen","Clot blood","Fight infection","Digest food"],a:2},
+    ],
+    hard:[
+      {q:"Newton's 2nd Law: F = ?",o:["mass×velocity","mass×accel","mass÷accel","mass×v²"],a:1},
+      {q:"Ohm's Law: V = ?",o:["I÷R","I×R","R÷I","I²×R"],a:1},
+      {q:"Atomic number of Carbon?",o:["6","8","12","14"],a:0},
+      {q:"pH of pure water?",o:["5","6","7","8"],a:2},
+      {q:"Kinetic energy formula?",o:["mv","mv²","½mv²","2mv²"],a:2},
+      {q:"Acid in stomach?",o:["H₂SO₄","HNO₃","HCl","CH₃COOH"],a:2},
+      {q:"Mitosis produces?",o:["4 cells","1 cell","2 cells","8 cells"],a:2},
+      {q:"Noble gas?",o:["Hydrogen","Oxygen","Argon","Nitrogen"],a:2},
+      {q:"Glucose formula?",o:["C₆H₁₂O₅","C₆H₁₂O₆","C₅H₁₀O₅","C₆H₁₀O₆"],a:1},
+      {q:"Vitamin from sunlight?",o:["A","B","C","D"],a:3},
+    ]
+  },
+  english:{
+    beginner:[
+      {q:"Opposite of 'hot'?",o:["Warm","Cold","Big","Soft"],a:1},
+      {q:"Which is a vowel?",o:["B","C","A","D"],a:2},
+      {q:"'Cat' is a ___?",o:["Verb","Adjective","Noun","Adverb"],a:2},
+      {q:"Fill: 'I ___ happy.'",o:["are","am","is","be"],a:1},
+      {q:"Plural of 'child'?",o:["Childs","Childes","Children","Childrens"],a:2},
+      {q:"A colour word?",o:["Run","Blue","Jump","Eat"],a:1},
+      {q:"'She ___ to school daily.'",o:["go","goes","going","gone"],a:1},
+      {q:"'I eat ___ apple.'",o:["a","an","the","—"],a:1},
+      {q:"Plural of 'bus'?",o:["Buss","Buses","Bus","Busses"],a:1},
+      {q:"Action word (verb)?",o:["Table","Jump","Red","Happy"],a:1},
+    ],
+    medium:[
+      {q:"Synonym of 'brave'?",o:["Cowardly","Bold","Weak","Shy"],a:1},
+      {q:"Antonym of 'ancient'?",o:["Old","Historic","Modern","Past"],a:2},
+      {q:"Correct spelling?",o:["Accomodate","Accommodate","Acommodate","Acomodate"],a:1},
+      {q:"Part of speech of 'quickly'?",o:["Noun","Adjective","Adverb","Verb"],a:2},
+      {q:"'I am going ___ school.'",o:["at","in","to","on"],a:2},
+      {q:"Plural of 'criterion'?",o:["Criterions","Criterias","Criteria","Criterias"],a:2},
+      {q:"Which is a conjunction?",o:["Quickly","Beautiful","Because","Table"],a:2},
+      {q:"Synonym of 'enormous'?",o:["Tiny","Small","Huge","Narrow"],a:2},
+      {q:"'I have been here ___ 2010.'",o:["for","since","from","by"],a:1},
+      {q:"Passive of 'She writes a letter'?",o:["A letter is written by her.","She is written.","Letter wrote her.","She writes."],a:0},
+    ],
+    hard:[
+      {q:"'Time is money' — figure of speech?",o:["Simile","Metaphor","Alliteration","Irony"],a:1},
+      {q:"Which is an oxymoron?",o:["Black cat","Run fast","Deafening silence","Blue sky"],a:2},
+      {q:"'Lest' is followed by?",o:["should","would","could","might"],a:0},
+      {q:"Gerund in 'Swimming is healthy'?",o:["is","healthy","Swimming","both"],a:2},
+      {q:"'Denouement' refers to?",o:["Climax","Final resolution","Introduction","Conflict"],a:1},
+      {q:"'Peter Piper picked…' is?",o:["Metaphor","Personification","Alliteration","Assonance"],a:2},
+      {q:"Author of 'Romeo and Juliet'?",o:["Dickens","Wordsworth","Shakespeare","Keats"],a:2},
+      {q:"'Serendipity' means?",o:["Sadness","Happy accident","Anger","Silence"],a:1},
+      {q:"Correct punctuation?",o:["Its raining.","It's raining.","Its' raining.","Its raining!"],a:1},
+      {q:"'Neither…___ '?",o:["or","nor","and","but"],a:1},
+    ]
+  },
+  gk:{
+    beginner:[
+      {q:"Capital of India?",o:["Mumbai","Kolkata","New Delhi","Chennai"],a:2},
+      {q:"Days in a week?",o:["5","6","7","8"],a:2},
+      {q:"National animal of India?",o:["Lion","Tiger","Elephant","Peacock"],a:1},
+      {q:"Tallest mountain?",o:["K2","Everest","Kanchenjunga","Makalu"],a:1},
+      {q:"National bird of India?",o:["Sparrow","Parrot","Peacock","Crow"],a:2},
+      {q:"How many continents?",o:["5","6","7","8"],a:2},
+      {q:"Father of the Nation (India)?",o:["Nehru","Bose","Gandhi","Patel"],a:2},
+      {q:"Largest ocean?",o:["Atlantic","Indian","Arctic","Pacific"],a:3},
+      {q:"Festival of Lights?",o:["Holi","Diwali","Eid","Christmas"],a:1},
+      {q:"National flower of India?",o:["Rose","Sunflower","Lotus","Jasmine"],a:2},
+    ],
+    medium:[
+      {q:"Who wrote India's National Anthem?",o:["Bankim Chandra","Tagore","Sarojini","Premchand"],a:1},
+      {q:"First PM of India?",o:["Rajendra Prasad","Indira Gandhi","J.L. Nehru","Patel"],a:2},
+      {q:"Largest country by area?",o:["USA","China","Canada","Russia"],a:3},
+      {q:"FIFA World Cup 2022 winner?",o:["France","Brazil","Argentina","Germany"],a:2},
+      {q:"First Indian in space?",o:["Kalpana Chawla","Rakesh Sharma","Sunita Williams","APJ Kalam"],a:1},
+      {q:"Longest river in the world?",o:["Amazon","Nile","Ganga","Yangtze"],a:1},
+      {q:"UN Headquarters is in?",o:["London","Paris","Geneva","New York"],a:3},
+      {q:"Telephone invented by?",o:["Edison","Tesla","Graham Bell","Marconi"],a:2},
+      {q:"Olympics every ___ years?",o:["2","3","4","5"],a:2},
+      {q:"Capital of Australia?",o:["Sydney","Melbourne","Canberra","Perth"],a:2},
+    ],
+    hard:[
+      {q:"Article abolishing untouchability?",o:["Art 14","Art 15","Art 17","Art 21"],a:2},
+      {q:"First Battle of Panipat — year?",o:["1526","1556","1606","1761"],a:0},
+      {q:"First woman President of India?",o:["Indira Gandhi","Pratibha Patil","Sonia Gandhi","Sarojini"],a:1},
+      {q:"Bretton Woods (1944) created?",o:["NATO","IMF & World Bank","UN","WTO"],a:1},
+      {q:"India's highest peak?",o:["Kanchenjunga","Nanda Devi","K2 (IN side)","Siachen"],a:0},
+      {q:"ISRO full form?",o:["Indian Space Research Org","Indian Science Research Org","Indian Satellite Research Org","Indian Space Rocket Org"],a:0},
+      {q:"Fundamental Duties — which amendment?",o:["42nd","44th","52nd","26th"],a:0},
+      {q:"India's first satellite?",o:["Rohini","INSAT-1","Aryabhata","Bhaskara"],a:2},
+      {q:"Father of Indian Constitution?",o:["Gandhi","Nehru","Ambedkar","Patel"],a:2},
+      {q:"Panchsheel Agreement — year?",o:["1950","1952","1954","1956"],a:2},
+    ]
+  },
+  cs:{
+    beginner:[
+      {q:"CPU stands for?",o:["Central Processing Unit","Computer Processing Unit","Central Program Unit","Core Processing Unit"],a:0},
+      {q:"Input device?",o:["Monitor","Printer","Keyboard","Speaker"],a:2},
+      {q:"Output device?",o:["Keyboard","Mouse","Printer","Scanner"],a:2},
+      {q:"'www' stands for?",o:["World Wide Web","Wide World Web","Web World Wide","World Web Wide"],a:0},
+      {q:"Programs on a computer are called?",o:["Hardware","Software","Memory","Disk"],a:1},
+      {q:"Stores data permanently?",o:["RAM","CPU","Hard Disk","Cache"],a:2},
+      {q:"Bits in 1 byte?",o:["4","8","16","32"],a:1},
+      {q:"Google Chrome is a?",o:["OS","Web Browser","Antivirus","Database"],a:1},
+      {q:"USB stands for?",o:["Universal Serial Bus","Unique System Bus","Universal System Backup","United Serial Bus"],a:0},
+      {q:"Shortcut to Save?",o:["Ctrl+C","Ctrl+V","Ctrl+S","Ctrl+Z"],a:2},
+    ],
+    medium:[
+      {q:"Not an Operating System?",o:["Windows","Linux","MS Word","macOS"],a:2},
+      {q:"HTML stands for?",o:["Hyper Text Markup Language","High Transfer Markup","Hyper Text Making Language","Hyper Transfer"],a:0},
+      {q:"IPv4 address octets?",o:["3","4","5","6"],a:1},
+      {q:"A compiler does?",o:["Stores data","Converts code to machine code","Manages memory","Shows output"],a:1},
+      {q:"Phishing is?",o:["A fishing game","A cyber attack","A programming concept","A network protocol"],a:1},
+      {q:"Binary uses digits?",o:["1,2","0,1","0-9","A-F"],a:1},
+      {q:"ROM stands for?",o:["Random Only Memory","Read Only Memory","Readable Output Memory","Run On Memory"],a:1},
+      {q:"Email sending protocol?",o:["FTP","HTTP","SMTP","TCP"],a:2},
+      {q:"1 KB = how many bytes?",o:["100","512","1024","2048"],a:2},
+      {q:"Python is a?",o:["Database","Programming Language","OS","Browser"],a:1},
+    ],
+    hard:[
+      {q:"Binary Search time complexity?",o:["O(n)","O(n²)","O(log n)","O(1)"],a:2},
+      {q:"Deadlock in OS?",o:["Hard disk crash","Processes wait forever","RAM overflow","Network failure"],a:1},
+      {q:"Fastest sorting on average?",o:["Bubble Sort","Insertion Sort","Quick Sort","Selection Sort"],a:2},
+      {q:"TCP stands for?",o:["Transfer Control Protocol","Transmission Control Protocol","Terminal Control Protocol","Transfer Connection"],a:1},
+      {q:"NOT an OOP concept?",o:["Inheritance","Polymorphism","Recursion","Encapsulation"],a:2},
+      {q:"Stack uses ___ principle?",o:["FIFO","LIFO","Random","LILO"],a:1},
+      {q:"HTTP OSI layer?",o:["Layer 3","Layer 5","Layer 7","Layer 4"],a:2},
+      {q:"API stands for?",o:["Application Programming Interface","Advanced Protocol Interface","Application Program Integration","Applied Protocol"],a:0},
+      {q:"Asymmetric encryption?",o:["AES","DES","RSA","SHA"],a:2},
+      {q:"Blockchain is?",o:["A type of RAM","A distributed immutable ledger","A social network","Cloud storage"],a:1},
+    ]
+  }
+};
+
+// ── GAME STATE ──
+let player1Name='P1', player2Name='P2';
+let player1Input='',  player2Input='';
+let ropePosition=0;
+let player1Locked=false, player2Locked=false;
+let currentQuestion={1:null,2:null};
+let usedQuestionIdx={1:[],2:[]};
+let gameStats={1:{correct:0,wrong:0,total:0},2:{correct:0,wrong:0,total:0}};
+let customPool=[];
+
+function rand(lo,hi){ return Math.floor(Math.random()*(hi-lo+1))+lo; }
+
+// ── MATH GENERATOR ──
+function generateMathQuestion(){
+  let a,b,answer,text;
+  if(currentLevel==='beginner'){
+    const op=['+','-','×'][rand(0,2)];
+    if(op==='+'){a=rand(1,20);b=rand(1,20);answer=a+b;}
+    else if(op==='-'){a=rand(5,20);b=rand(1,a);answer=a-b;}
+    else{a=rand(2,5);b=rand(2,10);answer=a*b;}
+    text=`${a} ${op} ${b} = ?`;
+  } else if(currentLevel==='medium'){
+    const op=['+','-','×','÷'][rand(0,3)];
+    if(op==='+'){a=rand(20,99);b=rand(20,99);answer=a+b;}
+    else if(op==='-'){a=rand(30,99);b=rand(1,a-1);answer=a-b;}
+    else if(op==='×'){a=rand(3,12);b=rand(3,12);answer=a*b;}
+    else{b=rand(2,12);answer=rand(2,12);a=b*answer;}
+    text=`${a} ${op} ${b} = ?`;
+  } else {
+    const t=rand(0,3);
+    if(t===0){a=rand(11,25);b=rand(11,25);answer=a*b;text=`${a} × ${b} = ?`;}
+    else if(t===1){b=rand(10,40);answer=rand(10,40);a=answer+b;text=`x + ${b} = ${a},  x = ?`;}
+    else if(t===2){answer=rand(2,12);a=answer*answer;text=`√${a} = ?`;}
+    else{const pct=rand(1,9)*10;b=rand(1,10)*100;answer=Math.round(pct/100*b);text=`${pct}% of ${b} = ?`;}
+  }
+  return{type:'math',text,answer:String(answer)};
+}
+
+// ── MCQ PICKER ──
+function getMCQQuestion(player){
+  const bank=currentSubject==='custom'?customPool:(QUESTION_BANK[currentSubject]?.[currentLevel]||[]);
+  if(!bank.length) return null;
+  if(usedQuestionIdx[player].length>=bank.length) usedQuestionIdx[player]=[];
+  let idx; do{idx=rand(0,bank.length-1);}while(usedQuestionIdx[player].includes(idx));
+  usedQuestionIdx[player].push(idx);
+  const q=bank[idx];
+  return{type:'mcq',text:q.q||q.question,options:q.o||q.options,answer:q.a!==undefined?q.a:q.answer};
+}
+
+// ── LOAD QUESTION ──
+function loadQuestion(player){
+  const isMath=currentSubject==='math';
+  if(isMath){
+    currentQuestion[player]=generateMathQuestion();
+    const el=document.getElementById(`qt${player}`);
+    el.textContent=currentQuestion[player].text; el.className='q-text';
+    document.getElementById(`ad${player}`).textContent='_';
+    if(player===1) player1Input=''; else player2Input='';
+  } else {
+    const q=getMCQQuestion(player);
+    currentQuestion[player]=q||{type:'mcq',text:'No questions available — ask your teacher to add some!',options:['—','—','—','—'],answer:0};
+    const el=document.getElementById(`qt${player}`);
+    el.textContent=currentQuestion[player].text; el.className='q-text mcq-text';
+    currentQuestion[player].options.forEach((opt,i)=>{
+      document.getElementById(`ot${player}-${i}`).textContent=opt;
+      const btn=document.getElementById(`o${player}-${i}`);
+      btn.className=`mcq-btn mcq-p${player}`; btn.disabled=false;
+    });
+  }
+}
+
+function setGameMode(){
+  const isMath=currentSubject==='math';
+  [1,2].forEach(p=>{
+    document.getElementById(`calc${p}`).style.display=isMath?'grid':'none';
+    document.getElementById(`mcq${p}`).style.display =isMath?'none':'grid';
+    document.getElementById(`ad${p}`).style.display  =isMath?'flex':'none';
+  });
+}
+
+// ── START GAME ──
+function startGame(){
+  const n1=document.getElementById('gs-p1').value.trim();
+  const n2=document.getElementById('gs-p2').value.trim();
+  if(!n1||!n2){showNotif('⚠️ Please enter both player names!','err');return;}
+  player1Name=n1; player2Name=n2;
+  if(currentSubject==='custom'){
+    const topic=document.getElementById('game-topic-select').value;
+    const allQ=getQuestions();
+    customPool=topic==='all'?allQ:allQ.filter(q=>q.topic===topic);
+    if(!customPool.length){showNotif('⚠️ No questions in this topic!','err');return;}
+  }
+  document.getElementById('h-p1n').textContent=player1Name;
+  document.getElementById('h-p2n').textContent=player2Name;
+  const sL={math:'🔢 Math',science:'🔬 Science',english:'📖 English',gk:'🌍 G.K.',cs:'💻 Comp',custom:'🌟 Custom'};
+  const lL={beginner:'🌱 Beginner',medium:'⚡ Medium',hard:'🔥 Advanced'};
+  document.getElementById('hbadge').textContent=`${sL[currentSubject]} • ${lL[currentLevel]}`;
+  ropePosition=0; player1Input=''; player2Input=''; player1Locked=false; player2Locked=false;
+  usedQuestionIdx={1:[],2:[]}; gameStats={1:{correct:0,wrong:0,total:0},2:{correct:0,wrong:0,total:0}};
+  updateScoreDisplay(); updateRope(); setGameMode(); loadQuestion(1); loadQuestion(2); updatePanels();
+  goTo('game');
+}
+
+// ── MATH INPUT ──
+function pressNumber(player,key){
+  if(currentSubject!=='math') return;
+  if(player===1&&player1Locked) return;
+  if(player===2&&player2Locked) return;
+  let input=player===1?player1Input:player2Input;
+  if(key==='del') input=input.slice(0,-1);
+  else if(key==='clr') input='';
+  else{if(input.length>=5) return; input+=key;}
+  if(player===1) player1Input=input; else player2Input=input;
+  document.getElementById(`ad${player}`).textContent=input||'_';
+  sfxClick();
+}
+function submitMath(player){
+  if(currentSubject!=='math') return;
+  if(player===1&&player1Locked) return;
+  if(player===2&&player2Locked) return;
+  const input=player===1?player1Input:player2Input;
+  if(!input) return;
+  gameStats[player].total++;
+  const display=document.getElementById(`ad${player}`);
+  if(input===currentQuestion[player].answer){
+    display.classList.add('pop'); setTimeout(()=>display.classList.remove('pop'),400);
+    gameStats[player].correct++; onCorrectAnswer(player);
+  } else {
+    gameStats[player].wrong++; display.classList.add('shake'); sfxWrong();
+    showToast(false,player===1?player1Name:player2Name);
+    setTimeout(()=>{
+      display.classList.remove('shake');
+      if(player===1){player1Input='';document.getElementById('ad1').textContent='_';}
+      else{player2Input='';document.getElementById('ad2').textContent='_';}
+    },500);
+  }
+}
+
+// ── MCQ INPUT ──
+function pickMCQ(player,selectedIdx){
+  if(player===1&&player1Locked) return;
+  if(player===2&&player2Locked) return;
+  for(let i=0;i<4;i++) document.getElementById(`o${player}-${i}`).disabled=true;
+  gameStats[player].total++;
+  const selected=document.getElementById(`o${player}-${selectedIdx}`);
+  const correctIdx=currentQuestion[player].answer;
+  if(selectedIdx===correctIdx){
+    selected.classList.add('correct'); gameStats[player].correct++; onCorrectAnswer(player);
+  } else {
+    selected.classList.add('wrong');
+    document.getElementById(`o${player}-${correctIdx}`).classList.add('correct');
+    gameStats[player].wrong++; sfxWrong(); showToast(false,player===1?player1Name:player2Name);
+    setTimeout(()=>{
+      for(let i=0;i<4;i++){const btn=document.getElementById(`o${player}-${i}`); btn.classList.remove('correct','wrong'); btn.disabled=(player===1?player1Locked:player2Locked);}
+    },900);
+  }
+}
+
+// ── CORRECT HANDLER ──
+function onCorrectAnswer(player){
+  sfxCorrect(); showToast(true,player===1?player1Name:player2Name);
+  if(player===1){ropePosition--;player1Locked=true;} else{ropePosition++;player2Locked=true;}
+  updateScoreDisplay(); updateRope(); updatePanels(); sfxRope();
+  setTimeout(()=>{
+    if(Math.abs(ropePosition)>=3){showWinScreen(ropePosition<0?1:2);return;}
+    loadQuestion(player);
+    if(player===1) player1Locked=false; else player2Locked=false;
+    updatePanels();
+  },900);
+}
+
+// ── ROPE DISPLAY ──
+const KNOT_POS={'-3':8,'-2':25,'-1':38,'0':50,'1':62,'2':75,'3':92};
+function updateRope(){
+  const pos=Math.max(-3,Math.min(3,ropePosition));
+  const pct=KNOT_POS[String(pos)];
+  const h=document.getElementById('rcon').offsetHeight||420;
+  document.getElementById('rkn').style.top=(pct/100*h-10)+'px';
+  const pips=[{id:'rp1',t:-2},{id:'rp2',t:-1},{id:'rp3',t:1},{id:'rp4',t:2}];
+  const posClass=['rp1','rp2','rp3','rp4'];
+  pips.forEach((pip,i)=>{
+    const el=document.getElementById(pip.id);
+    el.className=`rope-pip ${posClass[i]}`;
+    if(pip.t<0&&ropePosition<=pip.t) el.classList.add('pip-p1');
+    else if(pip.t>0&&ropePosition>=pip.t) el.classList.add('pip-p2');
+    else el.classList.add('pip-neutral');
+  });
+  const track=document.getElementById('rtk');
+  if(ropePosition<0) track.style.boxShadow=`inset 0 2px 4px rgba(0,0,0,.25),0 0 16px rgba(232,54,93,${.15+Math.abs(ropePosition)*.1})`;
+  else if(ropePosition>0) track.style.boxShadow=`inset 0 2px 4px rgba(0,0,0,.25),0 0 16px rgba(37,99,235,${.15+Math.abs(ropePosition)*.1})`;
+  else track.style.boxShadow='inset 0 2px 4px rgba(0,0,0,.25),0 0 10px rgba(200,149,10,.2)';
+}
+function updateScoreDisplay(){
+  document.getElementById('sc1').textContent=Math.max(0,-ropePosition);
+  document.getElementById('sc2').textContent=Math.max(0, ropePosition);
+}
+function updatePanels(){
+  [1,2].forEach(p=>{
+    const locked=p===1?player1Locked:player2Locked;
+    const panel=document.getElementById(`pp${p}`);
+    const status=document.getElementById(`st${p}`);
+    panel.className='player-panel'; status.className='status-msg';
+    if(!locked){
+      panel.classList.add(p===1?'active-p1':'active-p2');
+      status.classList.add(p===1?'status-p1':'status-p2');
+      status.textContent='🎯 YOUR TURN!';
+    } else {
+      status.classList.add('status-done');
+      status.textContent='✅ Answered correctly!';
+    }
+  });
+}
+
+// ── WIN SCREEN ──
+function showWinScreen(winner){
+  sfxWin();
+  const loser=winner===1?2:1;
+  const winName=winner===1?player1Name:player2Name;
+  const loseName=winner===1?player2Name:player1Name;
+  const ws=gameStats[winner], ls=gameStats[loser];
+  const wacc=ws.total>0?Math.round(ws.correct/ws.total*100):0;
+  const lacc=ls.total>0?Math.round(ls.correct/ls.total*100):0;
+  savePlayerResult(winName, ws.correct,ws.wrong,ws.total,currentSubject,currentLevel,true);
+  savePlayerResult(loseName,ls.correct,ls.wrong,ls.total,currentSubject,currentLevel,false);
+  const msgs=['Absolute genius! 🧠','What a performance! 🔥','Champion! 🌟','Master Mind! 🎯','Incredible! 💪'];
+  const msg=msgs[rand(0,msgs.length-1)];
+  const win=document.getElementById('win-screen');
+  win.style.display='flex';
+  win.innerHTML=`<div class="win-card">
+    <div class="win-trophy">🏆</div>
+    <div class="win-label">WINNER!</div>
+    <div class="win-name">${winName}</div>
+    <div class="win-message">${msg}</div>
+    <div class="result-cards">
+      <div class="result-card result-p${winner}">
+        <div class="result-name">${winName} 🏆</div>
+        <div class="result-stats">
+          <div class="result-stat"><div class="result-val" style="color:#86EFAC">${ws.correct}</div><div class="result-lbl">✅ Correct</div></div>
+          <div class="result-stat"><div class="result-val" style="color:#FCA5A5">${ws.wrong}</div><div class="result-lbl">❌ Wrong</div></div>
+          <div class="result-stat"><div class="result-val" style="color:#FCD34D">${wacc}%</div><div class="result-lbl">Accuracy</div></div>
+        </div>
+        <div style="font-size:.7rem;color:rgba(255,255,255,.4);margin-top:6px;">Total: ${ws.total} questions</div>
+      </div>
+      <div class="result-card result-p${loser}">
+        <div class="result-name">${loseName}</div>
+        <div class="result-stats">
+          <div class="result-stat"><div class="result-val" style="color:#86EFAC">${ls.correct}</div><div class="result-lbl">✅ Correct</div></div>
+          <div class="result-stat"><div class="result-val" style="color:#FCA5A5">${ls.wrong}</div><div class="result-lbl">❌ Wrong</div></div>
+          <div class="result-stat"><div class="result-val" style="color:#FCD34D">${lacc}%</div><div class="result-lbl">Accuracy</div></div>
+        </div>
+        <div style="font-size:.7rem;color:rgba(255,255,255,.4);margin-top:6px;">Total: ${ls.total} questions</div>
+      </div>
+    </div>
+    <div class="win-actions">
+      <button class="win-btn win-again" onclick="playAgain()">🔄 Play Again</button>
+      <button class="win-btn win-stats" onclick="viewFullStats()">📊 View Stats</button>
+      <button class="win-btn win-home"  onclick="goHome()">🏠 Home</button>
+    </div>
+  </div>`;
+  launchConfetti(winner);
+}
+
+function launchConfetti(player){
+  const colors=player===1?['#E8365D','#FF8FA3','#D97706']:['#2563EB','#60A5FA','#D97706','#A78BFA'];
+  for(let i=0;i<80;i++){
+    const p=document.createElement('div'); p.className='confetti-piece';
+    p.style.cssText=`left:${Math.random()*100}vw;background:${colors[rand(0,colors.length-1)]};width:${rand(5,13)}px;height:${rand(5,13)}px;border-radius:${Math.random()>.5?'50%':'3px'};animation-name:confettiFall;animation-duration:${(Math.random()*2.5+1.8).toFixed(1)}s;animation-delay:${(Math.random()*1.5).toFixed(1)}s;`;
+    document.body.appendChild(p); setTimeout(()=>p.remove(),5000);
+  }
+}
+
+function playAgain(){
+  document.getElementById('win-screen').style.display='none';
+  ropePosition=0; player1Input=''; player2Input=''; player1Locked=false; player2Locked=false;
+  usedQuestionIdx={1:[],2:[]}; gameStats={1:{correct:0,wrong:0,total:0},2:{correct:0,wrong:0,total:0}};
+  updateScoreDisplay(); updateRope(); setGameMode(); loadQuestion(1); loadQuestion(2); updatePanels();
+}
+function viewFullStats(){
+  document.getElementById('win-screen').style.display='none';
+  goTo('teacher-dash'); updateDashboardBadges(); renderPlayerStats(); switchTab('player-stats');
+}
+function goHome(){ document.getElementById('win-screen').style.display='none'; goTo('home'); }
+
+// ── TOAST & NOTIF ──
+function showToast(isCorrect,name){
+  const el=document.getElementById('toast');
+  el.className='toast show '+(isCorrect?'toast-ok':'toast-err');
+  el.textContent=isCorrect?`✅ ${name} — Correct! 🎉`:`❌ ${name} — Wrong!`;
+  setTimeout(()=>{el.className='toast';},1300);
+}
+function showNotif(message,type){
+  const el=document.getElementById('notif');
+  el.textContent=message; el.className=`notif notif-${type==='ok'?'ok':'err'} show`;
+  setTimeout(()=>{el.className='notif';},2500);
+}
+
+// ── KEYBOARD ──
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('game').classList.contains('active')&&currentSubject==='math'&&!player1Locked){
+    if(e.key>='0'&&e.key<='9'){sfxClick();pressNumber(1,e.key);}
+    if(e.key==='Backspace') pressNumber(1,'del');
+    if(e.key==='Enter')     submitMath(1);
+  }
+  if(e.target.id==='teacher-pwd'&&e.key==='Enter') teacherLogin();
+});
+
+// ── INIT ──
+window.addEventListener('load',()=>setTimeout(updateRope,100));
+updateDashboardBadges();
+</script>
+</body>
+</html>
